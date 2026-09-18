@@ -1,0 +1,14 @@
+[
+  {"device_id":"demo-esp32-dht11","temperature_c":24.6,"humidity_percent":48.2,"rssi_dbm":-51,"sample_time":"09:00"},
+  {"device_id":"demo-esp32-dht11","temperature_c":24.9,"humidity_percent":49.1,"rssi_dbm":-52,"sample_time":"09:05"},
+  {"device_id":"demo-esp32-dht11","temperature_c":25.2,"humidity_percent":50.4,"rssi_dbm":-52,"sample_time":"09:10"},
+  {"device_id":"demo-esp32-dht11","temperature_c":25.6,"humidity_percent":51.0,"rssi_dbm":-53,"sample_time":"09:15"},
+  {"device_id":"demo-esp32-dht11","temperature_c":26.1,"humidity_percent":52.3,"rssi_dbm":-54,"sample_time":"09:20"},
+  {"device_id":"demo-esp32-dht11","temperature_c":26.4,"humidity_percent":53.8,"rssi_dbm":-55,"sample_time":"09:25"},
+  {"device_id":"demo-esp32-dht11","temperature_c":26.8,"humidity_percent":55.2,"rssi_dbm":-55,"sample_time":"09:30"},
+  {"device_id":"demo-esp32-dht11","temperature_c":27.1,"humidity_percent":56.4,"rssi_dbm":-56,"sample_time":"09:35"},
+  {"device_id":"demo-esp32-dht11","temperature_c":27.4,"humidity_percent":57.1,"rssi_dbm":-56,"sample_time":"09:40"},
+  {"device_id":"demo-esp32-dht11","temperature_c":27.2,"humidity_percent":56.7,"rssi_dbm":-55,"sample_time":"09:45"},
+  {"device_id":"demo-esp32-dht11","temperature_c":26.9,"humidity_percent":55.6,"rssi_dbm":-54,"sample_time":"09:50"},
+  {"device_id":"demo-esp32-dht11","temperature_c":26.6,"humidity_percent":54.9,"rssi_dbm":-53,"sample_time":"09:55"}
+]
