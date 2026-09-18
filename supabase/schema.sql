@@ -38,10 +38,23 @@ create table if not exists public.alert_settings (
 -- Add ownership constraints to databases created from an earlier revision.
 do $$
 begin
-  if not exists (select 1 from pg_constraint where conname='devices_id_owner_key') then
+  if exists (
+    select 1 from public.telemetry t
+    join public.devices d on d.id=t.device_id
+    where t.owner_id is distinct from d.owner_id
+  ) then
+    raise exception 'Cannot add telemetry owner constraint: existing owner mismatches found';
+  end if;
+  if not exists (
+    select 1 from pg_constraint
+    where conname='devices_id_owner_key' and conrelid='public.devices'::regclass
+  ) then
     alter table public.devices add constraint devices_id_owner_key unique (id, owner_id);
   end if;
-  if not exists (select 1 from pg_constraint where conname='telemetry_device_owner_fk') then
+  if not exists (
+    select 1 from pg_constraint
+    where conname='telemetry_device_owner_fk' and conrelid='public.telemetry'::regclass
+  ) then
     alter table public.telemetry add constraint telemetry_device_owner_fk
       foreign key (device_id, owner_id) references public.devices(id, owner_id) on delete cascade;
   end if;
