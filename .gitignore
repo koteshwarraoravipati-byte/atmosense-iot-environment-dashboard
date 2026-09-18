@@ -1,0 +1,11 @@
+secrets/
+firmware/config.h
+dashboard/.env
+dashboard/data/users.json
+dashboard/android/
+dashboard/ios/
+dashboard/.env.production
+node_modules/
+*.pem
+*.key
+*.crt
