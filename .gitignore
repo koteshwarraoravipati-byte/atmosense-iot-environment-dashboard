@@ -2,6 +2,9 @@ secrets/
 firmware/config.h
 dashboard/.env
 dashboard/data/users.json
+dashboard/data/telemetry.json
+dashboard/data/devices.json
+dashboard/data/settings.json
 dashboard/android/
 dashboard/ios/
 dashboard/.env.production

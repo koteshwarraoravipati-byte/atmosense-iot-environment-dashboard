@@ -2,7 +2,7 @@
 
 ## Website
 
-The redesigned application is a responsive website with a landing page, login, account creation, protected workspace, live environmental cards, trend chart, device area, history placeholder, and mobile bottom navigation.
+Atmosense is a responsive IoT environmental monitoring dashboard with a landing page, demo or Supabase-ready authentication, live environmental cards, historical charts, CSV export, device management, configurable alerts, dark mode, and a college presentation page.
 
 Run it from the dashboard folder:
 
@@ -12,15 +12,13 @@ copy .env.example .env   # PowerShell; use `cp .env.example .env` in Linux
 npm start
 ```
 
-The included `.env.example` enables the prepared sample telemetry dataset. The server loads `.env` automatically.
+The included `.env.example` enables sample telemetry. The server loads `.env` automatically. Open `http://localhost:3000`.
 
-Open `http://localhost:3000`.
+## Mobile PWA
 
-## Install it on a phone as an app
+The project is a Progressive Web App. Deploy it over HTTPS, open the website on Android Chrome, choose **Install app** or **Add to Home screen**. On iPhone Safari choose **Share → Add to Home Screen**.
 
-The project is a Progressive Web App. Deploy it over HTTPS, open the website on Android Chrome, choose the browser menu, then choose **Install app** or **Add to Home screen**. On iPhone Safari choose **Share → Add to Home Screen**.
-
-A secure HTTPS deployment is required for service-worker installation. Localhost is allowed for development.
+A secure HTTPS deployment is required for service-worker installation. Localhost is allowed for development. The mobile layout includes compact navigation, responsive cards, charts, device filters, alert settings, and presentation content.
 
 ## Build an Android APK later
 
@@ -34,8 +32,14 @@ npx cap copy android
 npx cap open android
 ```
 
-Build the APK from Android Studio. The Android wrapper does not replace real authentication or AWS IoT provisioning; it packages the website for mobile.
+Build the APK from Android Studio. The Android wrapper packages the website; it does not replace authentication, AWS IoT provisioning, or device certificates.
 
-## Authentication note
+## Authentication and production data
 
-The current demo uses an Express server, a local JSON user store, salted `scrypt` password hashes, and HttpOnly session cookies. It is suitable for a classroom demo on a private server. Before public production, migrate users and sessions to Supabase Auth, Cognito, or another managed auth service; do not expose `dashboard/data/users.json` publicly.
+The default demo uses an Express server, a local JSON user store, salted `scrypt` password hashes, and HttpOnly session cookies. It is suitable for a classroom demo on a private server. Do not publish `dashboard/data/users.json` or runtime telemetry files.
+
+For production, set `AUTH_PROVIDER=supabase`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY` in the deployment environment, run `supabase/schema.sql` in the Supabase SQL editor, and configure the Supabase Auth redirect URL. The repository includes the schema and the frontend integration path. The server-side ownership/RLS cutover must be completed before using Supabase with multiple real users.
+
+## Live sensor cutover
+
+Keep `MOCK_DATA=true` for the presentation demo. For hardware mode, provision AWS IoT Core certificates privately, set `MOCK_DATA=false`, configure `AWS_IOT_ENDPOINT`, `MQTT_TOPIC`, and `CERT_DIR`, then flash the ESP32 firmware from `firmware/`. Never commit certificates, private keys, passwords, or production `.env` files.
