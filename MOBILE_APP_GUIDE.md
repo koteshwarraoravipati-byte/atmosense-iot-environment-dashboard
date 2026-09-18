@@ -28,19 +28,28 @@ The project is a Progressive Web App. Deploy it over HTTPS, open the website on 
 
 A secure HTTPS deployment is required for service-worker installation. Localhost is allowed for development. The mobile layout includes compact navigation, responsive cards, charts, device filters, alert settings, and presentation content.
 
-## Build an Android APK later
+## Build an Android APK
 
-The repository includes `dashboard/capacitor.config.json` with app ID `com.atmosense.monitor`:
+The repository includes `dashboard/capacitor.config.json` with app ID `com.atmosense.monitor` and pins Capacitor 7.6.9, the latest Node 20-compatible release used by this project.
+
+Required on the build machine:
+
+- Node.js 20 or newer
+- JDK 17
+- Android Studio with an Android SDK and emulator/device
+- Android SDK platform/build tools installed through Android Studio
+
+Create the native wrapper once, then sync web assets after every web change:
 
 ```bash
 cd dashboard
-npm install @capacitor/core @capacitor/cli @capacitor/android
-npx cap add android
+npm ci
+npm run cap:add:android   # first build only; creates the local android/ project
 npm run cap:sync
-npm run cap:android
+npm run cap:android      # opens Android Studio
 ```
 
-Build the APK from Android Studio. The Android wrapper packages the website; it does not replace authentication, AWS IoT provisioning, or device certificates. Native project folders and release keystores must remain private and are ignored by Git.
+Build and sign the APK/AAB from Android Studio. The Android wrapper packages the website; it does not replace authentication, AWS IoT provisioning, or device certificates. Native project folders and release keystores must remain private and are ignored by Git. This repository validates the JavaScript and dependency setup in CI; the final Android build still requires a machine with JDK and Android SDK tooling.
 
 ## Live sensor cutover
 
