@@ -1,9 +1,26 @@
 {
   "name": "iot-environment-dashboard",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "AWS IoT Core DHT11 environmental dashboard",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "dependencies": { "dotenv": "^16.4.7", "express": "^4.21.2", "mqtt": "^5.10.1" }
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --check public/app.js",
+    "cap:sync": "npx cap sync",
+    "cap:android": "npx cap open android",
+    "cap:add:android": "npx cap add android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.6.9",
+    "@supabase/supabase-js": "^2.57.4",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mqtt": "^5.10.1"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/cli": "^7.6.9"
+  }
 }

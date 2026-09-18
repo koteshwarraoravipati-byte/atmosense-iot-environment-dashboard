@@ -17,21 +17,24 @@ The public deployment begins in clearly labelled sample-data mode. The same code
 - Detect configurable temperature and humidity threshold violations.
 - Apply certificate-based authentication and least-privilege MQTT policies.
 - Provide a clear project presentation and evidence checklist.
+- Protect multi-user data with validated sessions and owner-scoped access.
 
 ## 3. System architecture
 
-`DHT11 → ESP32 → Wi-Fi → AWS IoT Core MQTT/TLS → Node.js ingestion → telemetry storage → Atmosense dashboard`
+`DHT11 → ESP32 → Wi-Fi → AWS IoT Core MQTT/TLS → Node.js ingestion → telemetry storage → authenticated dashboard`
 
-The device certificate is restricted to connect and publish only to `environment/dht11`. The dashboard uses a separate certificate restricted to connect, subscribe, and receive on that topic. This is the least-privilege boundary for the demonstration.
+The device certificate is restricted to connect and publish only to `environment/dht11`. The dashboard uses a separate certificate restricted to connect, subscribe, and receive on that topic. In Supabase mode, the browser uses Supabase Auth, protected API routes validate bearer tokens, and RLS scopes devices, telemetry, and alert settings by `auth.uid()`.
 
 ## 4. Components
 
-ESP32 DevKit, DHT11, SSD1306 I²C OLED, breadboard, jumper wires, USB cable, optional 10 kΩ pull-up resistor, AWS Academy Learner Lab, Node.js, Express, MQTT, and a modern browser.
+ESP32 DevKit, DHT11, SSD1306 I²C OLED, breadboard, jumper wires, USB cable, optional 10 kΩ pull-up resistor, AWS Academy Learner Lab, Node.js, Express, MQTT, Supabase Auth/Postgres, and a modern browser.
 
 ## 5. Implemented website features
 
 - Public Atmosense landing page.
 - Demo or Supabase-ready authentication boundary.
+- Supabase bearer-token validation for protected API routes.
+- Owner-scoped device, telemetry, and alert-setting access with RLS.
 - Live temperature and humidity cards.
 - Persistent JSON telemetry history for the classroom deployment.
 - 1-hour, 24-hour, 7-day, and all-time range controls.
@@ -42,6 +45,8 @@ ESP32 DevKit, DHT11, SSD1306 I²C OLED, breadboard, jumper wires, USB cable, opt
 - Alert view showing recent warnings.
 - Dark mode with persisted browser preference.
 - Responsive PWA layout for desktop and mobile.
+- Security headers, secure production cookies, rate-limited demo auth, request limits, and input validation.
+- Automated tests and GitHub Actions CI.
 - College presentation view and browser-readable project report.
 
 ## 6. Sample telemetry format
@@ -52,7 +57,7 @@ ESP32 DevKit, DHT11, SSD1306 I²C OLED, breadboard, jumper wires, USB cable, opt
 
 ## 7. Results and evidence
 
-During the final physical validation, capture the following:
+Physical validation remains to be completed with the actual ESP32, OLED, AWS account, and deployment environment. Capture the following during the final test:
 
 1. Wiring photograph.
 2. OLED showing temperature and humidity.
@@ -61,6 +66,8 @@ During the final physical validation, capture the following:
 5. History chart and alert threshold screenshot.
 6. Architecture diagram.
 7. A table containing at least five readings and device IDs.
+8. Supabase staging evidence showing two users cannot read each other's devices or telemetry.
+9. Android/PWA installation evidence if a mobile deliverable is required.
 
 | Time | OLED temperature | Dashboard temperature | OLED humidity | Dashboard humidity |
 |---|---:|---:|---:|---:|
@@ -72,14 +79,14 @@ During the final physical validation, capture the following:
 
 ## 8. Security, authentication, and cost controls
 
-TLS protects communication between the device and AWS IoT Core. Separate certificates are used for the device and dashboard. Private certificates, keys, Supabase service-role keys, and user data are excluded from the public repository. The classroom fallback uses salted scrypt password hashes and HttpOnly sessions. For public multi-user use, run `supabase/schema.sql`, configure Supabase Auth, and use row-level security with managed telemetry storage.
+TLS protects communication between the device and AWS IoT Core. Separate certificates are used for the device and dashboard. Private certificates, keys, Supabase service-role keys, user data, and Android signing keystores are excluded from the public repository. The classroom fallback uses salted scrypt password hashes and HttpOnly sessions. Production mode validates Supabase bearer tokens and relies on RLS for owner isolation. The private ingestion path uses the service-role key only on the server and accepts telemetry only for registered devices.
 
-The AWS Academy EC2 instance should be stopped when not being demonstrated, and unused IoT resources should be removed after evaluation. Render Free may sleep after inactivity.
+The AWS Academy EC2 instance should be stopped when not being demonstrated, and unused IoT resources should be removed after evaluation. Render Free may sleep after inactivity. Supabase staging should be used to verify RLS before real users are onboarded.
 
 ## 9. Limitations and future work
 
-DHT11 has limited accuracy and slow sampling compared with higher-grade sensors. The JSON persistence layer is a safe demo fallback, not a horizontally scalable database. The next production hardening step is to route telemetry and user-owned devices through Supabase/Postgres or an AWS-managed telemetry store, add email/push alert delivery, rate-limit auth endpoints, and complete physical ESP32 validation.
+DHT11 has limited accuracy and slow sampling compared with higher-grade sensors. The JSON persistence layer is a safe demo fallback, not a horizontally scalable database. Remaining delivery work is physical ESP32 validation, AWS/Supabase staging verification, optional email verification/password reset UI, and Android release signing. Further production hardening may add distributed rate limiting, telemetry retention policies, and alert delivery through email or push notifications.
 
 ## 10. Conclusion
 
-Atmosense demonstrates the complete IoT-to-cloud path: physical sensing, local visualization, secure MQTT communication, timestamped data storage, historical analysis, alerting, device organization, and browser-based monitoring. The architecture remains modular and can be extended with more sensors and locations.
+Atmosense demonstrates the complete IoT-to-cloud path: physical sensing, local visualization, secure MQTT communication, timestamped data storage, historical analysis, alerting, device organization, authenticated multi-user monitoring, and browser-based monitoring. The architecture remains modular and can be extended with more sensors and locations.
