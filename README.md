@@ -11,16 +11,19 @@ The public demo is intentionally labelled as sample mode until the physical ESP3
 ## Current website capabilities
 
 - Public landing page and product explanation.
-- Demo authentication with salted scrypt hashes, plus a Supabase Auth integration path.
-- Live temperature and humidity cards through Server-Sent Events.
+- Demo authentication with salted scrypt hashes, or Supabase Auth with validated bearer tokens.
+- User-scoped devices, telemetry, and alert settings when Supabase mode is enabled.
+- Live temperature and humidity cards through Server-Sent Events in demo mode and authenticated polling in Supabase mode.
 - Timestamped JSON history fallback with 1H, 24H, 7D, and All range controls.
 - Minimum, maximum, average, and reading-count summaries.
 - CSV export for project evidence and analysis.
 - Multiple named devices with locations, types, online state, and last-seen values.
 - Configurable temperature and humidity threshold alerts.
+- Security headers, secure production cookies, request-size limits, rate-limited demo login/signup, and input validation.
 - Dark mode with a persisted browser preference.
 - Responsive PWA experience for desktop and mobile.
 - College presentation guide and browser-readable project report at `/project-report.html`.
+- Node test suite and GitHub Actions CI for syntax checks and protected API flows.
 
 ## Hardware request list
 
@@ -41,20 +44,27 @@ DHT11: VCC→3V3, DATA→GPIO4, GND→GND. OLED: VCC→3V3, GND→GND, SDA→GPI
 
 ## Cloud architecture
 
-`DHT11 → ESP32 → Wi-Fi → AWS IoT Core MQTT/TLS → Node.js subscriber → telemetry history → Server-Sent Events → Atmosense dashboard`
+`DHT11 → ESP32 → Wi-Fi → AWS IoT Core MQTT/TLS → Node.js subscriber → telemetry history → Server-Sent Events/authenticated polling → Atmosense dashboard`
 
-The device certificate is restricted to connect and publish only to `environment/dht11`. The dashboard uses a separate certificate restricted to connect, subscribe, and receive on that topic.
+The device certificate is restricted to connect and publish only to `environment/dht11`. The dashboard uses a separate certificate restricted to connect, subscribe, and receive on that topic. In Supabase mode, the dashboard validates the user's bearer token on every protected request, while the server-side ingestion client writes telemetry using the private service-role key.
 
 ## Local setup
 
 ```bash
 cd dashboard
-npm install
+npm ci
 copy .env.example .env   # PowerShell; use cp on Linux/macOS
 npm start
 ```
 
 Open `http://localhost:3000`. The sample dataset is used when `MOCK_DATA=true` or no AWS endpoint is configured.
+
+Run validation before opening a pull request:
+
+```bash
+npm run check
+npm test
+```
 
 ## Live AWS IoT setup
 
@@ -65,13 +75,37 @@ Open `http://localhost:3000`. The sample dataset is used when `MOCK_DATA=true` o
 5. Configure the Node.js dashboard with `MOCK_DATA=false`, `AWS_IOT_ENDPOINT`, `MQTT_TOPIC`, and private dashboard certificates.
 6. Validate OLED, MQTT, dashboard, history, and alert evidence.
 
+The AWS setup scripts are intentionally idempotent for the named things and policies, but they still create billable/cloud resources. Review the generated `secrets/aws-config.json`, stop unused compute, and delete resources after evaluation.
+
 ## Supabase production path
 
-The application supports `AUTH_PROVIDER=supabase` when `SUPABASE_URL` and `SUPABASE_ANON_KEY` are configured. Run `supabase/schema.sql` as the starting point for user-owned devices, telemetry, and alert settings. The current JSON store remains a demo fallback; public multi-user telemetry should be moved to Supabase/Postgres or an AWS-managed data store with row-level security.
+1. Create a Supabase project and enable email authentication.
+2. Run `supabase/schema.sql` in the SQL Editor.
+3. Set `AUTH_PROVIDER=supabase`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY` in the deployment environment.
+4. Set `SUPABASE_SERVICE_ROLE_KEY` only on the private server that ingests AWS telemetry; never expose it to the browser or commit it.
+5. Register devices through the authenticated dashboard before publishing telemetry for them.
+6. Configure the Supabase Auth site URL and redirect URLs for the deployed dashboard.
+7. Test signup/login, expired tokens, RLS isolation, device CRUD, history, settings, and logout in a staging project.
+
+The repository keeps the JSON store as a demo fallback. Supabase mode uses RLS for user-owned devices, telemetry reads, and alert settings. Physical AWS and Supabase staging validation are still deployment tasks, not claims made by this repository.
+
+## Android/PWA packaging
+
+The website is installable as a PWA over HTTPS. For an Android wrapper:
+
+```bash
+cd dashboard
+npm install @capacitor/core @capacitor/cli @capacitor/android
+npx cap add android
+npm run cap:sync
+npm run cap:android
+```
+
+`capacitor.config.json` is checked in with the app ID `com.atmosense.monitor`. Native `android/` and `ios/` directories, signed APKs, and private keystores are intentionally ignored.
 
 ## Security notes
 
-Never commit `firmware/config.h`, private keys, certificates, Supabase service-role keys, `.env` files, or generated user data. The public repository contains configuration examples only.
+Never commit `firmware/config.h`, private keys, certificates, Supabase service-role keys, `.env` files, generated user data, or Android signing keystores. Production deployments must use HTTPS, Supabase Auth, a private ingestion credential, RLS, and a separate staging project before real users or devices are connected.
 
 ## College demonstration
 
