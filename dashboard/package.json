@@ -9,13 +9,18 @@
     "test": "node --test",
     "check": "node --check server.js && node --check public/app.js",
     "cap:sync": "npx cap sync",
-    "cap:android": "npx cap open android"
+    "cap:android": "npx cap open android",
+    "cap:add:android": "npx cap add android"
   },
   "dependencies": {
+    "@capacitor/core": "^7.6.9",
     "@supabase/supabase-js": "^2.57.4",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mqtt": "^5.10.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/cli": "^7.6.9"
+  }
 }
